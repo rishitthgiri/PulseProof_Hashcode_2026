@@ -180,17 +180,20 @@ def mean_rgb_from_boxes(video_path, boxes):
 
 # --------------------------------------------------------------------- main
 def process_video(video_path, label="unknown", cond="clean", backend="auto",
-                  max_seconds=None, reuse_boxes=None, method="pos", show=False):
+                  max_seconds=None, reuse_boxes=None, method="pos", show=False,
+                  name=None, plot=True):
     video_path = Path(video_path)
     if not video_path.exists():
         sys.exit(f"Video not found: {video_path}")
-    name = video_path.stem
+    name = name or video_path.stem          # pass name= when many videos share a file name
 
     cap = cv2.VideoCapture(str(video_path))
     if not cap.isOpened():
         sys.exit(f"Could not open video: {video_path}")
     fps = cap.get(cv2.CAP_PROP_FPS)
     n_total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    vid_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    vid_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     cap.release()
     if not fps or fps <= 1 or fps > 240:
         print("WARNING: fps metadata missing/odd, assuming 30.")
@@ -207,6 +210,14 @@ def process_video(video_path, label="unknown", cond="clean", backend="auto",
         data = np.load(cache / "rois" / f"{reuse_boxes}.npz")
         boxes, det_frac = data["boxes"], float(data["detected_frac"])
         print(f"Reusing boxes from cache/rois/{reuse_boxes}.npz")
+        if "frame_wh" in data.files:
+            ow, oh = [float(v) for v in data["frame_wh"]]
+            if (ow, oh) != (vid_w, vid_h):
+                print(f"Video size {int(ow)}x{int(oh)} -> {vid_w}x{vid_h}: scaling boxes")
+                boxes = boxes * np.array([vid_w / ow, vid_h / oh, vid_w / ow, vid_h / oh])
+        else:
+            print("WARNING: cached boxes have no frame size; if this video was resized, "
+                  "re-run the clean video once to regenerate them.")
         if len(boxes) > max_frames:
             boxes = boxes[:max_frames]
     else:
@@ -221,7 +232,8 @@ def process_video(video_path, label="unknown", cond="clean", backend="auto",
         if boxes is None:
             sys.exit("No face detected in any frame - cannot continue.")
         boxes = smooth_boxes(boxes)
-        np.savez(cache / "rois" / f"{name}.npz", boxes=boxes, detected_frac=det_frac, fps=fps)
+        np.savez(cache / "rois" / f"{name}.npz", boxes=boxes, detected_frac=det_frac, fps=fps,
+                 frame_wh=np.array([vid_w, vid_h], dtype=float))
 
     # ---- pass 2: mean RGB inside each box
     sig = mean_rgb_from_boxes(video_path, boxes)
@@ -243,9 +255,10 @@ def process_video(video_path, label="unknown", cond="clean", backend="auto",
     print(f"bpm spread across regions: {res['bpm_spread']:.1f}")
     for k, v in res["coherence"].items():
         print(f"coherence {k}: {v:.2f}")
-    png = cache / "plots" / f"{name}__{cond}.png"
-    rppg.plot_report(res, fps, f"{name} [{cond}] ({method.upper()})", png, show)
-    print(f"Saved plot    -> {png.relative_to(ROOT)}")
+    if plot:
+        png = cache / "plots" / f"{name}__{cond}.png"
+        rppg.plot_report(res, fps, f"{name} [{cond}] ({method.upper()})", png, show)
+        print(f"Saved plot    -> {png.relative_to(ROOT)}")
     return res
 
 
@@ -260,6 +273,8 @@ if __name__ == "__main__":
                     help="name of a clean video whose cached boxes to reuse")
     ap.add_argument("--method", choices=["pos", "chrom"], default="pos")
     ap.add_argument("--show", action="store_true", help="open the plot window")
+    ap.add_argument("--name", default=None, help="output name (default: video file name)")
+    ap.add_argument("--no-plot", action="store_true")
     a = ap.parse_args()
     process_video(a.video, a.label, a.cond, a.backend, a.max_seconds,
-                  a.reuse_boxes, a.method, a.show)
+                  a.reuse_boxes, a.method, a.show, a.name, not a.no_plot)

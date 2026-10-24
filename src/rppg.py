@@ -155,3 +155,12 @@ def plot_report(res, fs, title, save_path=None, show=False):
     if show:
         plt.show()
     plt.close(fig)
+
+def peak_ratio(pulse, fs):
+    f, p = spectrum(pulse, fs)
+    return float(p.max() / (p.sum() + 1e-12))
+
+def spec_entropy(pulse, fs):
+    f, p = spectrum(pulse, fs)
+    q = p / (p.sum() + 1e-12)
+    return float(-(q * np.log(q + 1e-12)).sum() / np.log(len(q)))

@@ -1,6 +1,12 @@
 __pycache__/
 *.pyc
 .venv/
+.venv312/
 cache/
+models/
 data/*
 !data/.gitkeep
+*.mp4
+*.avi
+*.mov
+*.joblib

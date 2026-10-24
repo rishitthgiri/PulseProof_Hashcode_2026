@@ -1,0 +1,8 @@
+numpy
+scipy
+matplotlib
+opencv-python
+# optional, better face tracking (legacy API; needs Python 3.9-3.12):
+# the next ones are for later hours
+scikit-learn
+streamlit

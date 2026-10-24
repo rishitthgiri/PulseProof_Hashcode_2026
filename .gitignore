@@ -11,3 +11,19 @@ data/processed/
 
 # Raw video datasets
 data/raw/
+
+# Python environments and caches
+.venv*/
+__pycache__/
+*.py[cod]
+
+# PulseProof generated outputs and logs
+outputs/
+logs/
+
+# Local video datasets and compression experiments
+data/raw/
+data/processed/
+
+# Local model checkpoints
+models/vision_cardio/*.pt

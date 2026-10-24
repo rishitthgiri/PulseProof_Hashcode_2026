@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import rppg  # noqa: E402
+import pulse as rppg  # noqa: E402
 from extract_signal import fill_missing  # noqa: E402
 
 rng = np.random.default_rng(0)

@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
-import rppg
+import pulse as rppg
 from extract_signal import process_video, ROOT
 
 REGIONS = ("forehead", "lcheek", "rcheek")

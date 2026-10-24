@@ -29,7 +29,7 @@ import numpy as np
 SRC = Path(__file__).resolve().parent
 ROOT = SRC.parent
 sys.path.insert(0, str(SRC))
-import rppg  # noqa: E402
+import pulse as rppg  # noqa: E402
 
 REGIONS = ["forehead", "lcheek", "rcheek"]
 LABELS = {"real": 0, "fake": 1, "unknown": -1}

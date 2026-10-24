@@ -6,7 +6,8 @@ import streamlit as st
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "src"))
-import predict, rppg  # noqa: E402
+import predict
+import pulse as rppg  # noqa: E402
 
 st.set_page_config(page_title="PulseProof", layout="wide")
 st.title("PulseProof: can we trust the pulse?")

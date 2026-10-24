@@ -1,0 +1,13 @@
+
+# Python virtual environments
+.venv/
+.venv312/
+__pycache__/
+*.py[cod]
+
+# Generated caches and previews
+cache/
+data/processed/
+
+# Raw video datasets
+data/raw/

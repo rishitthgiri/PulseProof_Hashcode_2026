@@ -1,0 +1,23 @@
+{
+  "dataset": "local_smoke_test",
+  "is_official_split": false,
+  "split_unit": "original_video",
+  "train": [
+    {
+      "video": "data/raw/real/my_video.mp4",
+      "label": "real"
+    }
+  ],
+  "val": [
+    {
+      "video": "data/raw/real/my_video2.mp4",
+      "label": "real"
+    }
+  ],
+  "test": [
+    {
+      "video": "data/raw/real/my_video3.mp4",
+      "label": "real"
+    }
+  ]
+}
